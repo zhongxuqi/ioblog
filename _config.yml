@@ -7,12 +7,13 @@ title: Carmen's Blog
 subtitle: This is Carmen's blog
 description:
 author: Carmen
-language: en
-timezone:
+language: zh-CN
+timezone: Asia/Shanghai
+email: zhongxuqi.1991@gmail.com
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: http://blog.electronlowtea.tech
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
