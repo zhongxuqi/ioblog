@@ -128,5 +128,51 @@ public class AspecjExample {
 ![img](/img/aspectj_example_output.png)
 
 ## 如何实现对网络请求API的监听
+#### 监听URLConnection:
+```
+@Around("call(* java.net.URL+.openConnection(..))")
+public Object onHttpURLOpenConnect(ProceedingJoinPoint joinPoint) throws Throwable {
+    ... // 建立Http连接，并获取主机IP和DNS时间
+}
 
-## 如何获取DNS时间
+@Around("call(* java.net.URLConnection+.getInputStream(..))")
+public Object onHttpURLConnectInput(ProceedingJoinPoint joinPoint) throws Throwable {
+    ... // 获取InputSteam，创建该InputSteam的代理，并且将代理作为结果返回
+}
+```
+
+#### 监听OkHttp:
+```
+@Around("call(* okhttp3.Dns+.lookup(..))")
+public Object onOkHttp3DnsLookup(ProceedingJoinPoint joinPoint) throws Throwable {
+    ... // 获取Host IP和DNS时间
+}
+
+@Around("call(* java.net.InetSocketAddress+.createUnresolved(..))")
+public Object onSocketAddressResolve(ProceedingJoinPoint joinPoint) throws Throwable {
+    ... // 获取Host IP和DNS时间
+}
+
+@Around("call(* okhttp3.Response.Builder+.build(..))")
+public Object onOkHttp3RespBuild(ProceedingJoinPoint joinPoint) throws Throwable {
+    ... // 保存Response和ResponseBody
+}
+
+@Around("call(* okhttp3.ResponseBody+.source(..))")
+public Object onOkHttp3RespBodySource(ProceedingJoinPoint joinPoint) throws Throwable {
+    ... // 建立ResponseBody的代理，并把该代理作为结果返回
+}
+```
+
+#### 监听WebView
+```
+@Around("call(* android.webkit.WebView+.setWebViewClient(..))")
+public Object onWebViewSetClient(ProceedingJoinPoint joinPoint) throws Throwable {
+    ... // 建立WebViewClient代理，并把带监听功能的代理作为结果返回
+}
+
+@Before("call(* android.webkit.WebView+.loadUrl(..))")
+public void onWebViewLoadUrl(JoinPoint joinPoint) {
+    ... // 如果该WebView未设置WebViewClient，就给它设置监听WebViewClient
+}
+```
