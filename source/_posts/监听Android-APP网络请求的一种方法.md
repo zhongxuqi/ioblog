@@ -27,8 +27,105 @@ tags:
 
 本文采用Aspectj来实现网络请求监听SDK
 ## Android Aspectj插件
+[Android Aspectj Git Repo](https://github.com/HujiangTechnology/gradle_plugin_android_aspectjx)
+##### 接入步骤如下所示：
+1. 关闭Android Intant Run
+![img](/img/close_instant_run.png)
+2. 修改Project的.gradle文件
+![img](/img/add_config_to_project.jpg)
+3. 修改Module的.gradle文件
+![img](/img/add_config_to_module.jpg)
 
 ## API Hook语法介绍
+常用的annotation有Before、Around、After，分别是在目标函数(需要进行aspectj hook的函数)执行的前、中、后期进行hook。主要的hook方式分为call和execution两种，它们区别如下所示:
+**call**
+``` js
+// <------- before call JoinPoint 
+targetFunc() // <------ around call JoinPoint
+// <------- after call JoinPoint 
+```
+**exection**
+``` js
+targetFunc() {
+    // <------- before execution JoinPoint 
+    ... // <------ around exection JoinPoint
+    // <------- after exection JoinPoint
+}
+```
+下面将通过一段代码来演示：
+**Activity.java**
+```
+public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        new Example().SayHelloWord();
+    }
+}
+```
+**Example.java**
+```
+public class Example {
+    private static final String TAG = "Example";
+
+    public void SayHelloWord() {
+        Log.i(TAG, "Hello world!");
+    }
+}
+```
+**AspecjExample.java**
+```
+@Aspect
+public class AspecjExample {
+    private static final String TAG = "AspecjExample";
+    protected static final AspecjExample instance = new AspecjExample();
+
+    @Before("call(* testapp.aspectjtest.Example.SayHelloWord(..))")
+    public void BeforeCall(JoinPoint joinPoint) throws Throwable {
+        Log.i(TAG, "Aspectj Before call SayHelloWord");
+    }
+
+    @Before("execution(* testapp.aspectjtest.Example.SayHelloWord(..))")
+    public void BeforeExecution(JoinPoint joinPoint) throws Throwable {
+        Log.i(TAG, "Aspectj Before execution SayHelloWord");
+    }
+
+    @Around("call(* testapp.aspectjtest.Example.SayHelloWord(..))")
+    public Object AroundCall(ProceedingJoinPoint joinPoint) throws Throwable {
+        Log.i(TAG, "Aspectj Around start call SayHelloWord");
+        Object ret = joinPoint.proceed();
+        Log.i(TAG, "Aspectj Around end call SayHelloWord");
+        return ret;
+    }
+
+    @Around("execution(* testapp.aspectjtest.Example.SayHelloWord(..))")
+    public Object AroundExecution(ProceedingJoinPoint joinPoint) throws Throwable {
+        Log.i(TAG, "Aspectj Around start execution SayHelloWord");
+        Object ret = joinPoint.proceed();
+        Log.i(TAG, "Aspectj Around end execution SayHelloWord");
+        return ret;
+    }
+
+    @After("call(* testapp.aspectjtest.Example.SayHelloWord(..))")
+    public void AfterCall(JoinPoint joinPoint) throws Throwable {
+        Log.i(TAG, "Aspectj After call SayHelloWord");
+    }
+
+    @After("execution(* testapp.aspectjtest.Example.SayHelloWord(..))")
+    public void AfterExecution(JoinPoint joinPoint) throws Throwable {
+        Log.i(TAG, "Aspectj After execution SayHelloWord");
+    }
+
+    public static AspecjExample aspectOf() {
+        return instance;
+    }
+}
+```
+输入结果为：
+![img](/img/aspectj_example_output.png)
 
 ## 如何实现对网络请求API的监听
 
